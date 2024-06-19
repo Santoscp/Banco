@@ -2,6 +2,7 @@ package Servidor;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.List;
 
 public class GesConect extends Thread {
     private DAO dao;
@@ -29,13 +30,13 @@ public class GesConect extends Thread {
                       switch (comando) {
                           case "crearusuario":
   
-                        	  String usunuevo = in.readLine();
-                        	  in.close();
-                        	  String passnueva = in.readLine();
-            
-                        	  
-                      
-                        	  dao.crearUsuario(usunuevo, "hola");
+                        	    String usunuevo = in.readLine();
+                                
+                           
+                                String passnueva = in.readLine();
+                                
+                            
+                                dao.crearUsuario(usunuevo, passnueva);
                         	  
                         	  
                         	 
@@ -43,19 +44,46 @@ public class GesConect extends Thread {
 
                         
                               break;
-                          case "retirar":
-                              double cantidadRetirar = Double.parseDouble(in.readLine());
-                              if (dao.retirarDinero(usuario, cantidadRetirar)) {
-                                  out.println("Retiro exitoso");
-                              } else {
-                                  out.println("Saldo insuficiente");
+                          case "crearcuenta":
+                        	  
+                              int id_usuario = in.read();
+                              int saldoInicial = in.read();
+                              try {
+                                  dao.crearCuentaBancaria(id_usuario ,saldoInicial);
+                                  out.println("Cuenta bancaria creada con éxito.");
+                              } catch (RuntimeException e) {
+                                  out.println("Error al crear la cuenta bancaria: " + e.getMessage());
                               }
                               break;
-                          case "ingresar":
-                              double cantidadIngresar = Double.parseDouble(in.readLine());
-                              dao.ingresarDinero(usuario, cantidadIngresar);
-                              out.println("Ingreso exitoso");
+                              
+                          case "consultarcuenta":
+                        	  String idCuentaStr = in.readLine(); 
+                              int idCuenta = Integer.parseInt(idCuentaStr); 
+                              System.out.println(idCuenta);
+
+                              double datosCuenta = dao.getCuenta(idCuenta);
+                              
+                              out.println("Saldo: " + datosCuenta);
                               break;
+                              
+                          case "consultarcliente":
+                        	  String idClienteStr = in.readLine();
+                        	  int idCliente =Integer.parseInt(idClienteStr);
+                        	  System.out.println(idCliente);
+                              String datosCliente = dao.obtenerDatosCliente(idCliente);
+                              out.println(datosCliente);
+                           
+                              break;
+                          case "eliminarcuenta":
+                        	  String idCuentaEliStr = in.readLine();
+                        	  int idCuentaEli =Integer.parseInt(idCuentaEliStr);
+              
+                            dao.eliminarCuenta(idCuentaEli);
+                              out.println("Cuenta eliminada");
+                           
+                              break;
+                              
+                              
                           case "salir":
                               running = false;
                               break;

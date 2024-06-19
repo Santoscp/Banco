@@ -4,6 +4,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DAO {
     private Connection connection;
@@ -45,7 +47,7 @@ public class DAO {
             ResultSet rs = stmt.executeQuery();
            if(rs.next()) {
         	   int count =rs.getInt(1);
-        	   isAdmind=count>0 && "admind".equals(usuario) && "admind".equals(password);
+        	   isAdmind=count>0 && "admin".equals(usuario) && "admin".equals(password);
            }
             
             
@@ -148,6 +150,94 @@ public class DAO {
     	
     	
     }
+    
+    public void crearCuentaBancaria(int id_usuario, int saldoInicial) {
+        try {
+    
+            String queryVerificacionCliente = "SELECT COUNT(*) FROM usuarios WHERE id = ?";
+            PreparedStatement stmtVerificacionCliente = connection.prepareStatement(queryVerificacionCliente);
+            stmtVerificacionCliente.setInt(1, id_usuario);
+            ResultSet rsVerificacionCliente = stmtVerificacionCliente.executeQuery();
+            if (!rsVerificacionCliente.next() || rsVerificacionCliente.getInt(1) == 0) {
+                throw new SQLException("El cliente no existe.");
+            }
+
+          
+            String queryVerificacionCuenta = "SELECT COUNT(*) FROM cuentas WHERE id_usuario = ?";
+            PreparedStatement stmtVerificacionCuenta = connection.prepareStatement(queryVerificacionCuenta);
+            stmtVerificacionCuenta.setInt(1, id_usuario);
+            ResultSet rsVerificacionCuenta = stmtVerificacionCuenta.executeQuery();
+            if (rsVerificacionCuenta.next() && rsVerificacionCuenta.getInt(1) > 0) {
+                throw new SQLException("El cliente ya tiene una cuenta.");
+            }
+
+           
+            String query = "INSERT INTO cuentas (id_usuario, saldo) VALUES (?, ?)";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setInt(1, id_usuario);
+            stmt.setInt(2, saldoInicial);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    
+    
+    public synchronized double getCuenta(int id) {
+        double saldo = 0.0;
+        try {
+            String query = "SELECT saldo "
+                         + "FROM cuentas  "
+                         + "WHERE id = ?";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                saldo = rs.getDouble("saldo");
+            } else {
+                System.out.println("Usuario no encontrado");
+            }
+          
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+       
+        return saldo;
+    }
+    
+    public String obtenerDatosCliente(int idCliente) {
+  
+    	
+        try {
+            String query = "SELECT * FROM usuarios WHERE id = ?";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            System.out.println(idCliente);
+            stmt.setInt(1, idCliente);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return "ID: " + rs.getString("nombre") + " , contrasena :" + rs.getString("password");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "Cliente no encontrado.";
+    }
+    public void eliminarCuenta(int idCuenta) {
+        try {
+            String query = "DELETE FROM cuentas WHERE id = ?";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setInt(1, idCuenta);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
+    
     
     
     
