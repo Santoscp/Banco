@@ -20,16 +20,40 @@ public class DAO {
 
     public synchronized boolean login(String usuario, String password) {
         try {
-            String query = "SELECT * FROM usuarios WHERE username = ? AND password = ?";
+            String query = "SELECT * FROM usuarios WHERE nombre = ? AND password = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, usuario);
             stmt.setString(2, password);
+            
             ResultSet rs = stmt.executeQuery();
+           
+            
             return rs.next();
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return false;
+    }
+    public synchronized boolean getUsuario(String usuario, String password) {
+    	boolean isAdmind=false;
+        try {
+            String query = "SELECT * FROM usuarios WHERE nombre = ? AND password = ?";
+            PreparedStatement stmt = connection.prepareStatement(query);
+            stmt.setString(1, usuario);
+            stmt.setString(2, password);
+            
+            ResultSet rs = stmt.executeQuery();
+           if(rs.next()) {
+        	   int count =rs.getInt(1);
+        	   isAdmind=count>0 && "admind".equals(usuario) && "admind".equals(password);
+           }
+            
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return isAdmind;
+        
     }
 
     public synchronized double getSaldo(String usuario) {
@@ -37,8 +61,8 @@ public class DAO {
         try {
             String query = "SELECT c.saldo "
                          + "FROM cuentas c "
-                         + "JOIN usuarios u ON c.user_id = u.id "
-                         + "WHERE u.username = ?";
+                         + "JOIN usuarios u ON c.id_usuario = u.id "
+                         + "WHERE u.nombre = ?";
             PreparedStatement stmt = connection.prepareStatement(query);
             stmt.setString(1, usuario);
             ResultSet rs = stmt.executeQuery();
@@ -56,16 +80,16 @@ public class DAO {
     public synchronized boolean retirarDinero(String usuario, double cantidad) {
     	boolean retirar=true;
         try {
-            String getUserIdQuery = "SELECT id FROM usuarios WHERE username = ?";
-            PreparedStatement getUserIdStmt = connection.prepareStatement(getUserIdQuery);
-            getUserIdStmt.setString(1, usuario);
-            ResultSet rs = getUserIdStmt.executeQuery();
+            String idQuery = "SELECT id FROM usuarios WHERE nombre = ?";
+            PreparedStatement getUserId = connection.prepareStatement(idQuery);
+            getUserId.setString(1, usuario);
+            ResultSet rs = getUserId.executeQuery();
             if (rs.next()) {
-                int userId = rs.getInt("id");
-                String query = "UPDATE cuentas SET saldo = saldo - ? WHERE user_id = ?";
+                int idUsuario = rs.getInt("id");
+                String query = "UPDATE cuentas SET saldo = saldo - ? WHERE id_usuario = ?";
                 PreparedStatement stmt = connection.prepareStatement(query);
                 stmt.setDouble(1, cantidad);
-                stmt.setInt(2, userId);
+                stmt.setInt(2, idUsuario);
                 stmt.executeUpdate();
               retirar = true;
                
@@ -83,13 +107,13 @@ public class DAO {
 
     public synchronized void ingresarDinero(String usuario, double cantidad) {
         try {
-            String getUserIdQuery = "SELECT id FROM usuarios WHERE username = ?";
-            PreparedStatement getUserIdStmt = connection.prepareStatement(getUserIdQuery);
-            getUserIdStmt.setString(1, usuario);
-            ResultSet rs = getUserIdStmt.executeQuery();
+            String idQuery = "SELECT id FROM usuarios WHERE nombre = ?";
+            PreparedStatement getUserId = connection.prepareStatement(idQuery);
+            getUserId.setString(1, usuario);
+            ResultSet rs = getUserId.executeQuery();
             if (rs.next()) {
                 int userId = rs.getInt("id");
-                String query = "UPDATE cuentas SET saldo = saldo + ? WHERE user_id = ?";
+                String query = "UPDATE cuentas SET saldo = saldo + ? WHERE id_usuario = ?";
                 PreparedStatement stmt = connection.prepareStatement(query);
                 stmt.setDouble(1, cantidad);
                 stmt.setInt(2, userId);
@@ -101,5 +125,32 @@ public class DAO {
             e.printStackTrace();
         }
     }
+    
+    public synchronized void crearUsuario(String nombre, String password) {
+    	
+    	  String query = "INSERT INTO usuarios (nombre, password) VALUES (?, ?)";
+
+          try (PreparedStatement stmt = connection.prepareStatement(query)) {
+              stmt.setString(1, nombre);
+              stmt.setString(2, password);
+
+              int rowsAffected = stmt.executeUpdate();
+             
+          } catch (SQLException e) {
+              if (e.getErrorCode() == 1062) { // Error de clave duplicada
+                  System.out.println("El nombre de usuario ya existe.");
+              } else {
+                  e.printStackTrace();
+              }
+          }
+       
+    	 
+    	
+    	
+    }
+    
+    
+    
+    
 
 }

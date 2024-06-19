@@ -20,7 +20,55 @@ public class GesConect extends Thread {
             String usuario = in.readLine();
             String password = in.readLine();
             
-            if (dao.login(usuario, password)) {
+            if(dao.getUsuario(usuario, password)) {
+            	out.println("Admind completado");
+            	  boolean running = true;
+            	  while (running) {
+                      String comando = in.readLine();
+                      
+                      switch (comando) {
+                          case "crearusuario":
+  
+                        	  String usunuevo = in.readLine();
+                        	  in.close();
+                        	  String passnueva = in.readLine();
+            
+                        	  
+                      
+                        	  dao.crearUsuario(usunuevo, "hola");
+                        	  
+                        	  
+                        	 
+                        	  
+
+                        
+                              break;
+                          case "retirar":
+                              double cantidadRetirar = Double.parseDouble(in.readLine());
+                              if (dao.retirarDinero(usuario, cantidadRetirar)) {
+                                  out.println("Retiro exitoso");
+                              } else {
+                                  out.println("Saldo insuficiente");
+                              }
+                              break;
+                          case "ingresar":
+                              double cantidadIngresar = Double.parseDouble(in.readLine());
+                              dao.ingresarDinero(usuario, cantidadIngresar);
+                              out.println("Ingreso exitoso");
+                              break;
+                          case "salir":
+                              running = false;
+                              break;
+                          default:
+                              out.println("Comando deconocido");
+                              break;
+                      }
+                  }
+            	
+            	
+            	
+
+            }else  if (dao.login(usuario, password)) {
                 out.println("Inicio completado");
                 boolean running = true;
                 
@@ -49,12 +97,12 @@ public class GesConect extends Thread {
                             running = false;
                             break;
                         default:
-                            out.println("Comando no reconocido");
+                            out.println("Comando deconocido");
                             break;
                     }
                 }
             } else {
-                out.println("Login failed");
+                out.println("Login fallido");
             }
             
             socket.close();

@@ -12,31 +12,88 @@ public class Cliente {
         	Socket socket = new Socket(host, port);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader console = new BufferedReader(new InputStreamReader(System.in))) {
+             BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in))) {
 
             System.out.print("Ingrese su nombre de usuario: ");
-            String usuario = console.readLine();
-            System.out.print("Ingrese su contraseña: ");
-            String password = console.readLine();
+            String usuario = teclado.readLine();
+            System.out.print("Ingrese su contrasena: ");
+            String password = teclado.readLine();
 
             out.println(usuario);
             out.println(password);
 
-            String respuesta = in.readLine();
-            System.out.println(respuesta);
+            String op1 = in.readLine();
+ 
+            System.out.println(op1);
+            
+            
+            
+            if("Admind completado".equals(op1)) {
+            	System.out.println("HOLA soy solo el admin");
+            	  boolean inicio = true;
+                  while (inicio) {
+                      System.out.println("\nOpciones:");
+                      System.out.println("1. Crear usuario ");
+                      System.out.println("2. Retirar dinero");
+                      System.out.println("3. Ingresar dinero");
+                      System.out.println("4. Salir");
+                      System.out.print("Seleccione una opcion: ");
+                      String op2 = teclado.readLine();
 
-            if ("Inicio completado".equals(respuesta)) {
-                boolean running = true;
-                while (running) {
+                      switch (op2) {
+                          case "1":
+                              out.println("crearusuario");
+                              System.out.println("Nombre del usuario");
+                              String nombreUsu = teclado.readLine();
+                              out.println(nombreUsu);
+
+                              
+                              
+                              
+                              System.out.println(in.readLine());
+                              break;
+                          case "2":
+                              out.println("retirar");
+                              System.out.print("Cantidad a retirar: ");
+                              String cantidadRetirar = teclado.readLine();
+                              out.println(cantidadRetirar);
+                              System.out.println(in.readLine());
+                              break;
+                          case "3":
+                              out.println("ingresar");
+                              System.out.print("Cantidad a ingresar: ");
+                              String cantidadIngresar = teclado.readLine();
+                              out.println(cantidadIngresar);
+                              System.out.println(in.readLine());
+                              break;
+                          case "4":
+                          	
+                          	System.out.println("Adioss");
+                              out.println("salir");
+                              inicio = false;
+                              break;
+                          default:
+                              System.out.println("Opcion no valida");
+                              break;
+                      }
+                  }
+            	
+            	
+            	
+            	
+            	
+            }else  if ("Inicio completado".equals(op1)) {
+                boolean inicio = true;
+                while (inicio) {
                     System.out.println("\nOpciones:");
                     System.out.println("1. Ver saldo");
                     System.out.println("2. Retirar dinero");
                     System.out.println("3. Ingresar dinero");
                     System.out.println("4. Salir");
-                    System.out.print("Seleccione una opción: ");
-                    String opcion = console.readLine();
+                    System.out.print("Seleccione una opcion: ");
+                    String op2 = teclado.readLine();
 
-                    switch (opcion) {
+                    switch (op2) {
                         case "1":
                             out.println("saldo");
                             System.out.println(in.readLine());
@@ -44,28 +101,30 @@ public class Cliente {
                         case "2":
                             out.println("retirar");
                             System.out.print("Cantidad a retirar: ");
-                            String cantidadRetirar = console.readLine();
+                            String cantidadRetirar = teclado.readLine();
                             out.println(cantidadRetirar);
                             System.out.println(in.readLine());
                             break;
                         case "3":
                             out.println("ingresar");
                             System.out.print("Cantidad a ingresar: ");
-                            String cantidadIngresar = console.readLine();
+                            String cantidadIngresar = teclado.readLine();
                             out.println(cantidadIngresar);
                             System.out.println(in.readLine());
                             break;
                         case "4":
+                        	
+                        	System.out.println("Adioss");
                             out.println("salir");
-                            running = false;
+                            inicio = false;
                             break;
                         default:
-                            System.out.println("Opción no válida");
+                            System.out.println("Opcion no valida");
                             break;
                     }
                 }
             } else {
-                System.out.println("Autenticación fallida.");
+                System.out.println("Autenticacion fallida.");
             }
 
         } catch (IOException e) {
